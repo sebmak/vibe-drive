@@ -4,7 +4,7 @@
  */
 
 // TODO: Replace these with your actual OAuth 2.0 Client ID from the Google Cloud Console
-const CLIENT_ID = 'API_KEY';
+const CLIENT_ID = '822855827589-mno7tvuhhodhkoot6032q5jmhjenu3hs.apps.googleusercontent.com';
 
 // Discovery doc URL for APIs used by the quickstart
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
@@ -83,14 +83,14 @@ class CloudApiService {
             if (resp.error !== undefined) {
                 throw (resp);
             }
-            
+
             // Save token and calculate expiry (subtract 5 seconds for buffer)
             const expiresAt = Date.now() + ((resp.expires_in - 5) * 1000);
             localStorage.setItem('drive_oauth_token', JSON.stringify({
                 access_token: resp.access_token,
                 expiresAt: expiresAt
             }));
-            
+
             if (callback) callback();
         };
 
@@ -110,7 +110,7 @@ class CloudApiService {
      */
     restoreToken() {
         if (!this.gapiInited) return false;
-        
+
         const stored = localStorage.getItem('drive_oauth_token');
         if (stored) {
             try {
@@ -141,9 +141,10 @@ class CloudApiService {
 
     /**
      * Fetches files from Google Drive
+     * @param {string} parentId - The ID of the folder to fetch from (defaults to 'root')
      * @returns {Promise<Array>} List of formatted drive items
      */
-    async getDriveItems() {
+    async getDriveItems(parentId = 'root') {
         if (!this.gapiInited || gapi.client.getToken() === null) {
             throw new Error('User not authenticated');
         }
@@ -154,13 +155,13 @@ class CloudApiService {
             const params = new URLSearchParams({
                 pageSize: 20,
                 fields: 'files(id, name, mimeType, modifiedTime, size, parents)',
-                q: "'root' in parents and trashed = false"
+                q: `'${parentId}' in parents and trashed = false`
             });
-            
+
             const response = await fetch(`https://www.googleapis.com/drive/v3/files?${params.toString()}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             const data = await response.json();
             const files = data.files;
 

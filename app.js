@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const driveGrid = document.getElementById('drive-grid');
     const loader = document.getElementById('loader');
+    const breadcrumbsContainer = document.getElementById('breadcrumbs');
+    
+    let folderStack = [{ id: 'root', name: 'My Drive' }];
     
     const authorizeButton = document.getElementById('authorize_button');
     const signoutButton = document.getElementById('signout_button');
@@ -59,8 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.cloudApi.restoreToken()) {
             authorizeButton.style.display = 'none';
             signoutButton.style.display = 'block';
-            loader.innerHTML = '<div class="spinner"></div>';
-            await loadDriveData();
+            handleHashChange();
         } else {
             authorizeButton.style.display = 'block';
             loader.innerHTML = '<p style="color: var(--text-secondary);">Click Sign In to view your drive files.</p>';
@@ -72,9 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Successfully authorized
             authorizeButton.style.display = 'none';
             signoutButton.style.display = 'block';
-            
-            loader.innerHTML = '<div class="spinner"></div>';
-            await loadDriveData();
+            handleHashChange();
         });
     };
 
@@ -88,10 +88,48 @@ document.addEventListener('DOMContentLoaded', () => {
         loader.innerHTML = '<p style="color: var(--text-secondary);">Click Sign In to view your drive files.</p>';
     };
     
+    async function handleHashChange() {
+        const hash = window.location.hash;
+        let folderId = 'root';
+        
+        if (hash.startsWith('#/folder/')) {
+            folderId = hash.replace('#/folder/', '');
+        }
+
+        const existingIndex = folderStack.findIndex(f => f.id === folderId);
+        if (existingIndex !== -1) {
+            folderStack = folderStack.slice(0, existingIndex + 1);
+        } else {
+            // Direct link or fresh history state
+            if (folderId !== 'root') {
+                folderStack = [
+                    { id: 'root', name: 'My Drive' },
+                    { id: folderId, name: 'Folder' }
+                ];
+            } else {
+                folderStack = [{ id: 'root', name: 'My Drive' }];
+            }
+        }
+
+        renderBreadcrumbs();
+        
+        driveGrid.classList.add('hidden');
+        loader.classList.remove('hidden');
+        loader.innerHTML = '<div class="spinner"></div>';
+        
+        await loadDriveData(folderId);
+    }
+    
+    window.addEventListener('hashchange', () => {
+        if (window.cloudApi.gapiInited && localStorage.getItem('drive_oauth_token')) {
+            handleHashChange();
+        }
+    });
+
     // Load data
-    async function loadDriveData() {
+    async function loadDriveData(folderId) {
         try {
-            const items = await window.cloudApi.getDriveItems();
+            const items = await window.cloudApi.getDriveItems(folderId);
             renderItems(items);
         } catch (error) {
             console.error('Failed to load drive items:', error);
@@ -137,7 +175,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
+            if (item.type === 'folder') {
+                el.style.cursor = 'pointer';
+                el.addEventListener('click', () => {
+                    folderStack.push({ id: item.id, name: item.name });
+                    window.location.hash = `/folder/${item.id}`;
+                });
+            }
+            
             driveGrid.appendChild(el);
+        });
+    }
+
+    // Render breadcrumbs
+    function renderBreadcrumbs() {
+        breadcrumbsContainer.innerHTML = '';
+        
+        folderStack.forEach((folder, index) => {
+            const span = document.createElement('span');
+            span.textContent = folder.name;
+            
+            if (index === folderStack.length - 1) {
+                span.className = 'current';
+            } else {
+                span.style.cursor = 'pointer';
+                span.addEventListener('click', () => {
+                    window.location.hash = folder.id === 'root' ? '' : `/folder/${folder.id}`;
+                });
+            }
+            
+            breadcrumbsContainer.appendChild(span);
+            
+            if (index < folderStack.length - 1) {
+                const icon = document.createElement('i');
+                icon.className = 'fa-solid fa-chevron-right';
+                breadcrumbsContainer.appendChild(icon);
+            }
         });
     }
 
