@@ -4,7 +4,7 @@
  */
 
 // TODO: Replace these with your actual OAuth 2.0 Client ID from the Google Cloud Console
-const CLIENT_ID = '***REMOVED***';
+const CLIENT_ID = 'API_KEY';
 
 // Discovery doc URL for APIs used by the quickstart
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
