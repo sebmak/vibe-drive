@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Drive</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-cloud"></i>
+                <span>CloudDrive</span>
+            </div>
+            
+            <button class="new-btn">
+                <i class="fa-solid fa-plus"></i>
+                <span>New</span>
+            </button>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="fa-solid fa-hard-drive"></i>
+                    <span>My Drive</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Shared with me</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>Recent</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-star"></i>
+                    <span>Starred</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-trash"></i>
+                    <span>Trash</span>
+                </a>
+            </nav>
+
+            <div class="storage-info">
+                <div class="storage-bar">
+                    <div class="storage-used" style="width: 45%;"></div>
+                </div>
+                <span class="storage-text">45 GB of 100 GB used</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Search in Drive">
+                </div>
+                <div class="profile-actions">
+                    <button class="icon-btn" id="authorize_button" title="Sign In to Google Drive" style="display: none;"><i class="fa-solid fa-right-to-bracket"></i></button>
+                    <button class="icon-btn" id="signout_button" title="Sign Out" style="display: none;"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    <button class="icon-btn"><i class="fa-solid fa-circle-question"></i></button>
+                    <button class="icon-btn"><i class="fa-solid fa-gear"></i></button>
+                    <div class="profile-avatar">
+                        <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" alt="User">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Drive Content Area -->
+            <div class="drive-area">
+                <div class="drive-header">
+                    <h2>My Drive</h2>
+                    <div class="view-options">
+                        <button class="icon-btn active" id="btn-grid"><i class="fa-solid fa-border-all"></i></button>
+                        <button class="icon-btn" id="btn-list"><i class="fa-solid fa-list"></i></button>
+                    </div>
+                </div>
+
+                <div class="breadcrumbs">
+                    <span>My Drive</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span class="current">Project Files</span>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loader" class="loader-container">
+                    <div class="spinner"></div>
+                </div>
+
+                <!-- Drive Grid -->
+                <div id="drive-grid" class="drive-grid hidden">
+                    <!-- Items will be injected here by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
